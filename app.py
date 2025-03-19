@@ -79,6 +79,12 @@ learn_text = dcc.Markdown(
     """
 )
 
+history_text = dcc.Markdown(
+    """
+    someting is something sna doasmoisf
+    """
+)
+
 cagr_text = dcc.Markdown(
     """
     (CAGR) is the compound annual growth rate.  It measures the rate of return for an investment over a period of time, 
@@ -297,6 +303,17 @@ slider_card = dbc.Card(
             value=50,
             included=False,
         ),
+        html.H4("Bond Allocation %:", className="card-title"),
+        dcc.Slider(
+            id="bond_allocation",
+            marks={i: f"{i}%" for i in range(0, 101, 10)},
+            min=0,
+            max=100,
+            step=5,
+            value=40,
+            included=False,
+            disabled=True,
+        ),
     ],
     body=True,
     className="mt-4",
@@ -449,6 +466,15 @@ learn_card = dbc.Card(
     className="mt-4",
 )
 
+# ========= Something Tab  Components
+history_card = dbc.Card(
+    [
+        dbc.CardHeader("An Introduction to Asset Allocation"),
+        dbc.CardBody(history_text),
+    ],
+    className="mt-4",
+)
+
 
 # ========= Build tabs
 tabs = dbc.Tabs(
@@ -461,6 +487,7 @@ tabs = dbc.Tabs(
             className="pb-4",
         ),
         dbc.Tab([results_card, data_source_card], tab_id="tab-3", label="Results"),
+        dbc.Tab(history_card, tab_id="tab4", label="History"),
     ],
     id="tabs",
     active_tab="tab-2",
@@ -722,6 +749,13 @@ def update_totals(stocks, cash, start_bal, planning_time, start_yr):
 
     return data, fig, summary_table, ending_amount, ending_cagr
 
+@app.callback(
+    Output("bond_allocation", "value"),
+    [Input("cash", "value"), Input("stock_bond", "value")],
+)
+def update_bond_allocation(cash_value, stock_bond_value):
+    remaining_allocation = 100 - cash_value - stock_bond_value
+    return remaining_allocation
 
 if __name__ == "__main__":
     app.run(debug=True)
